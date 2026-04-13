@@ -1,0 +1,146 @@
+import java.util.*;
+
+class Product {
+    int id;
+    String name;
+    int price;
+    int gst; // GST percentage
+
+    Product(int id, String name, int price, int gst) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.gst = gst;
+    }
+}
+
+class BillItem {
+    Product product;
+    int quantity;
+
+    BillItem(Product product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
+    }
+}
+
+class Bill {
+    String billId;
+    List<BillItem> items;
+    double totalAmount;
+
+    Bill(String billId, List<BillItem> items, double totalAmount) {
+        this.billId = billId;
+        this.items = items;
+        this.totalAmount = totalAmount;
+    }
+}
+
+public class GSTBillingSystem {
+
+    static List<Product> products = new ArrayList<>();
+    static List<Bill> bills = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+
+        initializeProducts();
+
+        int choice;
+        do {
+            System.out.println("\n====== GST BILLING SYSTEM ======");
+            System.out.println("1. View Products");
+            System.out.println("2. Create Bill");
+            System.out.println("3. View Bills");
+            System.out.println("4. Search Bill");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+
+            switch (choice) {
+                case 1: viewProducts(); break;
+                case 2: createBill(); break;
+                case 3: viewBills(); break;
+                case 4: searchBill(); break;
+                case 5: System.out.println("Thank you 🧾"); break;
+                default: System.out.println("Invalid choice!");
+            }
+
+        } while (choice != 5);
+    }
+
+    static void initializeProducts() {
+        products.add(new Product(1, "Laptop", 50000, 18));
+        products.add(new Product(2, "Book", 500, 5));
+        products.add(new Product(3, "Shoes", 2000, 12));
+    }
+
+    static void viewProducts() {
+        for (Product p : products) {
+            System.out.println(p.id + " | " + p.name + " | ₹" + p.price + " | GST: " + p.gst + "%");
+        }
+    }
+
+    static void createBill() {
+        List<BillItem> items = new ArrayList<>();
+        char more;
+
+        do {
+            System.out.print("Enter Product ID: ");
+            int id = sc.nextInt();
+            System.out.print("Enter Quantity: ");
+            int qty = sc.nextInt();
+
+            for (Product p : products) {
+                if (p.id == id) {
+                    items.add(new BillItem(p, qty));
+                }
+            }
+
+            System.out.print("Add more items? (y/n): ");
+            more = sc.next().charAt(0);
+
+        } while (more == 'y');
+
+        double total = 0;
+
+        System.out.println("\n--- INVOICE ---");
+        for (BillItem b : items) {
+            double base = b.product.price * b.quantity;
+            double tax = base * b.product.gst / 100;
+            double finalPrice = base + tax;
+
+            total += finalPrice;
+
+            System.out.println(b.product.name + " x " + b.quantity +
+                    " | Base: ₹" + base +
+                    " | GST: ₹" + tax +
+                    " | Total: ₹" + finalPrice);
+        }
+
+        String billId = "BILL" + new Random().nextInt(10000);
+        bills.add(new Bill(billId, items, total));
+
+        System.out.println("\nBill ID: " + billId);
+        System.out.println("Final Amount: ₹" + total);
+    }
+
+    static void viewBills() {
+        for (Bill b : bills) {
+            System.out.println("ID: " + b.billId + " | Amount: ₹" + b.totalAmount);
+        }
+    }
+
+    static void searchBill() {
+        System.out.print("Enter Bill ID: ");
+        String id = sc.next();
+
+        for (Bill b : bills) {
+            if (b.billId.equals(id)) {
+                System.out.println("Found Bill | Amount: ₹" + b.totalAmount);
+                return;
+            }
+        }
+        System.out.println("Bill not found!");
+    }
+}

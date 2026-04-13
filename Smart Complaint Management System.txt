@@ -1,0 +1,120 @@
+import java.util.*;
+
+class Complaint {
+    int id;
+    String description;
+    String department;
+    String priority;
+    String status;
+
+    Complaint(int id, String description) {
+        this.id = id;
+        this.description = description;
+        this.priority = setPriority(description);
+        this.department = assignDepartment(description);
+        this.status = "Pending";
+    }
+
+    // AI-like logic (keyword based)
+    static String setPriority(String desc) {
+        desc = desc.toLowerCase();
+        if (desc.contains("urgent") || desc.contains("critical"))
+            return "High";
+        else if (desc.contains("delay"))
+            return "Medium";
+        else
+            return "Low";
+    }
+
+    static String assignDepartment(String desc) {
+        desc = desc.toLowerCase();
+        if (desc.contains("network") || desc.contains("system"))
+            return "IT";
+        else if (desc.contains("clean") || desc.contains("water"))
+            return "Maintenance";
+        else
+            return "Admin";
+    }
+}
+
+public class ComplaintSystem {
+
+    static ArrayList<Complaint> complaints = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int choice;
+
+        do {
+            System.out.println("\n====== SMART COMPLAINT SYSTEM ======");
+            System.out.println("1. Register Complaint");
+            System.out.println("2. View Complaints");
+            System.out.println("3. Resolve Complaint");
+            System.out.println("4. Search Complaint");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1: addComplaint(); break;
+                case 2: viewComplaints(); break;
+                case 3: resolveComplaint(); break;
+                case 4: searchComplaint(); break;
+                case 5: System.out.println("Thank you 🧠"); break;
+                default: System.out.println("Invalid choice!");
+            }
+
+        } while (choice != 5);
+    }
+
+    static void addComplaint() {
+        System.out.print("Enter Complaint ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        System.out.print("Enter Description: ");
+        String desc = sc.nextLine();
+
+        Complaint c = new Complaint(id, desc);
+        complaints.add(c);
+
+        System.out.println("Complaint registered ✅");
+        System.out.println("Priority: " + c.priority);
+        System.out.println("Assigned to: " + c.department);
+    }
+
+    static void viewComplaints() {
+        for (Complaint c : complaints) {
+            System.out.println(c.id + " | " + c.description +
+                    " | " + c.priority +
+                    " | " + c.department +
+                    " | " + c.status);
+        }
+    }
+
+    static void resolveComplaint() {
+        System.out.print("Enter Complaint ID: ");
+        int id = sc.nextInt();
+
+        for (Complaint c : complaints) {
+            if (c.id == id) {
+                c.status = "Resolved";
+                System.out.println("Complaint resolved ✅");
+                return;
+            }
+        }
+        System.out.println("Not found!");
+    }
+
+    static void searchComplaint() {
+        System.out.print("Enter keyword: ");
+        String key = sc.nextLine().toLowerCase();
+
+        for (Complaint c : complaints) {
+            if (c.description.toLowerCase().contains(key)) {
+                System.out.println(c.id + " | " + c.description);
+            }
+        }
+    }
+}

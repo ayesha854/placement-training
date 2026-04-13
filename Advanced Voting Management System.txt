@@ -1,0 +1,116 @@
+import java.util.*;
+
+class Voter {
+    String voterId;
+    boolean hasVoted;
+
+    Voter(String voterId) {
+        this.voterId = voterId;
+        this.hasVoted = false;
+    }
+}
+
+public class VotingSystem {
+    static HashMap<String, Voter> voters = new HashMap<>();
+    static HashMap<String, Integer> candidates = new HashMap<>();
+    static ArrayList<String> history = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+
+        // Initialize voters
+        voters.put("V101", new Voter("V101"));
+        voters.put("V102", new Voter("V102"));
+        voters.put("V103", new Voter("V103"));
+
+        // Initialize candidates
+        candidates.put("Alice", 0);
+        candidates.put("Bob", 0);
+        candidates.put("Charlie", 0);
+
+        int choice;
+
+        do {
+            System.out.println("\n====== VOTING SYSTEM ======");
+            System.out.println("1. Cast Vote");
+            System.out.println("2. View Results");
+            System.out.println("3. Declare Winner");
+            System.out.println("4. Voting History");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1: castVote(); break;
+                case 2: viewResults(); break;
+                case 3: declareWinner(); break;
+                case 4: showHistory(); break;
+                case 5: System.out.println("Thank you 🗳️"); break;
+                default: System.out.println("Invalid choice!");
+            }
+
+        } while (choice != 5);
+    }
+
+    static void castVote() {
+        System.out.print("Enter Voter ID: ");
+        String id = sc.nextLine();
+
+        if (!voters.containsKey(id)) {
+            System.out.println("Invalid Voter ID ❌");
+            return;
+        }
+
+        Voter v = voters.get(id);
+
+        if (v.hasVoted) {
+            System.out.println("You have already voted 🚫");
+            return;
+        }
+
+        System.out.println("Candidates: " + candidates.keySet());
+        System.out.print("Enter candidate name: ");
+        String name = sc.nextLine();
+
+        if (!candidates.containsKey(name)) {
+            System.out.println("Invalid candidate ❌");
+            return;
+        }
+
+        candidates.put(name, candidates.get(name) + 1);
+        v.hasVoted = true;
+
+        history.add("Voter " + id + " voted for " + name);
+
+        System.out.println("Vote cast successfully ✅");
+    }
+
+    static void viewResults() {
+        System.out.println("\n--- LIVE RESULTS ---");
+        for (String c : candidates.keySet()) {
+            System.out.println(c + " : " + candidates.get(c) + " votes");
+        }
+    }
+
+    static void declareWinner() {
+        String winner = "";
+        int maxVotes = -1;
+
+        for (String c : candidates.keySet()) {
+            if (candidates.get(c) > maxVotes) {
+                maxVotes = candidates.get(c);
+                winner = c;
+            }
+        }
+
+        System.out.println("🏆 Winner: " + winner + " with " + maxVotes + " votes");
+    }
+
+    static void showHistory() {
+        System.out.println("\n--- VOTING HISTORY ---");
+        for (String h : history) {
+            System.out.println(h);
+        }
+    }
+}

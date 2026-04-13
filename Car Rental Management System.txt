@@ -1,0 +1,143 @@
+import java.util.*;
+
+class Car {
+    int id;
+    String name;
+    String type;
+    boolean isBooked;
+
+    Car(int id, String name, String type) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.isBooked = false;
+    }
+}
+
+class Rental {
+    String bookingId;
+    String customerName;
+    int carId;
+    int days;
+    int totalCost;
+
+    Rental(String bookingId, String customerName, int carId, int days, int totalCost) {
+        this.bookingId = bookingId;
+        this.customerName = customerName;
+        this.carId = carId;
+        this.days = days;
+        this.totalCost = totalCost;
+    }
+}
+
+public class CarRentalSystem {
+
+    static ArrayList<Car> cars = new ArrayList<>();
+    static ArrayList<Rental> rentals = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+
+        // Initialize cars
+        cars.add(new Car(1, "Swift", "Hatchback"));
+        cars.add(new Car(2, "Honda City", "Sedan"));
+        cars.add(new Car(3, "Fortuner", "SUV"));
+
+        int choice;
+
+        do {
+            System.out.println("\n====== CAR RENTAL SYSTEM ======");
+            System.out.println("1. View Cars");
+            System.out.println("2. Rent Car");
+            System.out.println("3. View Rentals");
+            System.out.println("4. Return Car");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1: viewCars(); break;
+                case 2: rentCar(); break;
+                case 3: viewRentals(); break;
+                case 4: returnCar(); break;
+                case 5: System.out.println("Thank you 🚗"); break;
+                default: System.out.println("Invalid choice!");
+            }
+
+        } while (choice != 5);
+    }
+
+    static void viewCars() {
+        for (Car c : cars) {
+            System.out.println(c.id + " | " + c.name + " | " + c.type +
+                    " | " + (c.isBooked ? "Booked" : "Available"));
+        }
+    }
+
+    static void rentCar() {
+        System.out.print("Enter Car ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        for (Car c : cars) {
+            if (c.id == id && !c.isBooked) {
+
+                System.out.print("Enter Customer Name: ");
+                String name = sc.nextLine();
+
+                System.out.print("Enter Days: ");
+                int days = sc.nextInt();
+
+                int cost = calculateCost(c.type, days);
+
+                c.isBooked = true;
+
+                String bookingId = "CAR" + new Random().nextInt(10000);
+                rentals.add(new Rental(bookingId, name, id, days, cost));
+
+                System.out.println("\n🚗 Car Booked!");
+                System.out.println("Booking ID: " + bookingId);
+                System.out.println("Total Cost: ₹" + cost);
+                return;
+            }
+        }
+        System.out.println("Car not available!");
+    }
+
+    static int calculateCost(String type, int days) {
+        int rate = 0;
+
+        if (type.equals("Hatchback"))
+            rate = 1000;
+        else if (type.equals("Sedan"))
+            rate = 2000;
+        else if (type.equals("SUV"))
+            rate = 3000;
+
+        return rate * days;
+    }
+
+    static void viewRentals() {
+        System.out.println("\n--- RENTAL HISTORY ---");
+        for (Rental r : rentals) {
+            System.out.println("ID: " + r.bookingId + " | Name: " + r.customerName +
+                    " | Car: " + r.carId + " | Days: " + r.days +
+                    " | ₹" + r.totalCost);
+        }
+    }
+
+    static void returnCar() {
+        System.out.print("Enter Car ID: ");
+        int id = sc.nextInt();
+
+        for (Car c : cars) {
+            if (c.id == id && c.isBooked) {
+                c.isBooked = false;
+                System.out.println("Car returned successfully ✅");
+                return;
+            }
+        }
+        System.out.println("Invalid Car ID!");
+    }
+}

@@ -1,0 +1,149 @@
+import java.util.*;
+
+class Bus {
+    int busNo;
+    String route;
+    int totalSeats;
+    boolean[] seats;
+
+    Bus(int busNo, String route, int totalSeats) {
+        this.busNo = busNo;
+        this.route = route;
+        this.totalSeats = totalSeats;
+        this.seats = new boolean[totalSeats];
+    }
+}
+
+class Ticket {
+    String ticketId;
+    String passengerName;
+    int busNo;
+    int seatNo;
+    int fare;
+
+    Ticket(String ticketId, String passengerName, int busNo, int seatNo, int fare) {
+        this.ticketId = ticketId;
+        this.passengerName = passengerName;
+        this.busNo = busNo;
+        this.seatNo = seatNo;
+        this.fare = fare;
+    }
+}
+
+public class BusManagementSystem {
+    static ArrayList<Bus> buses = new ArrayList<>();
+    static ArrayList<Ticket> tickets = new ArrayList<>();
+    static Scanner sc = new Scanner(System.in);
+
+    public static void main(String[] args) {
+
+        // Initialize buses
+        buses.add(new Bus(101, "Chennai - Bangalore", 10));
+        buses.add(new Bus(102, "Chennai - Coimbatore", 8));
+
+        int choice;
+
+        do {
+            System.out.println("\n====== BUS MANAGEMENT SYSTEM ======");
+            System.out.println("1. View Buses");
+            System.out.println("2. Book Ticket");
+            System.out.println("3. View Tickets");
+            System.out.println("4. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1: viewBuses(); break;
+                case 2: bookTicket(); break;
+                case 3: viewTickets(); break;
+                case 4: System.out.println("Thank you 🚌"); break;
+                default: System.out.println("Invalid choice!");
+            }
+
+        } while (choice != 4);
+    }
+
+    static void viewBuses() {
+        for (Bus b : buses) {
+            System.out.println("Bus No: " + b.busNo + " | Route: " + b.route +
+                    " | Available Seats: " + countAvailableSeats(b));
+        }
+    }
+
+    static int countAvailableSeats(Bus b) {
+        int count = 0;
+        for (boolean seat : b.seats) {
+            if (!seat) count++;
+        }
+        return count;
+    }
+
+    static void bookTicket() {
+        System.out.print("Enter Bus No: ");
+        int busNo = sc.nextInt();
+        sc.nextLine();
+
+        Bus selectedBus = null;
+        for (Bus b : buses) {
+            if (b.busNo == busNo) {
+                selectedBus = b;
+                break;
+            }
+        }
+
+        if (selectedBus == null) {
+            System.out.println("Bus not found!");
+            return;
+        }
+
+        System.out.print("Enter Seat No (1-" + selectedBus.totalSeats + "): ");
+        int seatNo = sc.nextInt();
+        sc.nextLine();
+
+        if (seatNo < 1 || seatNo > selectedBus.totalSeats) {
+            System.out.println("Invalid seat!");
+            return;
+        }
+
+        if (selectedBus.seats[seatNo - 1]) {
+            System.out.println("Seat already booked 🚫");
+            return;
+        }
+
+        System.out.print("Enter Passenger Name: ");
+        String name = sc.nextLine();
+
+        selectedBus.seats[seatNo - 1] = true;
+
+        int fare = calculateFare(selectedBus.route);
+        String ticketId = "T" + new Random().nextInt(10000);
+
+        Ticket t = new Ticket(ticketId, name, busNo, seatNo, fare);
+        tickets.add(t);
+
+        System.out.println("\n🎟️ Ticket Booked Successfully!");
+        System.out.println("Ticket ID: " + ticketId);
+        System.out.println("Passenger: " + name);
+        System.out.println("Seat No: " + seatNo);
+        System.out.println("Fare: ₹" + fare);
+    }
+
+    static int calculateFare(String route) {
+        if (route.contains("Bangalore"))
+            return 500;
+        else if (route.contains("Coimbatore"))
+            return 400;
+        else
+            return 300;
+    }
+
+    static void viewTickets() {
+        System.out.println("\n--- BOOKED TICKETS ---");
+        for (Ticket t : tickets) {
+            System.out.println("ID: " + t.ticketId + " | Name: " + t.passengerName +
+                    " | Bus: " + t.busNo + " | Seat: " + t.seatNo +
+                    " | Fare: ₹" + t.fare);
+        }
+    }
+}
